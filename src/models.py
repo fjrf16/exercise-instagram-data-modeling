@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -8,31 +8,31 @@ from eralchemy import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class User(Base):
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    username = Column(String(100), nullable=False)
+    email = Column(String(50), nullable=False)
+    password = Column(String(30), nullable=False)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+class Storie(Base):
+    __tablename__ = 'stories'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    user = Column(Integer, ForeignKey('users.id'))
 
-    def to_dict(self):
-        return {}
+class Feed(Base):
+    __tablename__ = 'feeds'
+    id = Column(Integer, primary_key=True)
+    user = Column(Integer, ForeignKey('users.id'))
+    comments = Column(String, nullable=True)
+
+class Direct(Base):
+    __tablename__ = 'directs'
+    id = Column(Integer, primary_key=True)
+    user_orig = Column(Integer, ForeignKey('users.id'))
+    user_dest = Column(Integer, ForeignKey('users.id'))
+    dir_storie = Column(Integer, ForeignKey('stories.id'))
+    dir_feed = Column(Integer, ForeignKey('feeds.id'))
 
 ## Draw from SQLAlchemy base
-try:
-    result = render_er(Base, 'diagram.png')
-    print("Success! Check the diagram.png file")
-except Exception as e:
-    print("There was a problem genering the diagram")
-    raise e
+render_er(Base, 'diagram.png')
